@@ -1,3 +1,13 @@
+"""
+    @Author: Julian Ariel Campana
+    @Subject: Inteligencia Artificial
+    @Assignment: Trabajo Practico Nº 1
+
+    Tercer Ejercicio, funcionamiento de aspiradora simple con
+    conocimiento de sus alrededores y el objetivo de realizar
+    la menor cantidad de movimientos posibles.
+"""
+
 import random
 
 # Estado de las baldosas

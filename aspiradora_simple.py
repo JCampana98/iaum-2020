@@ -1,3 +1,12 @@
+"""
+    @Author: Julian Ariel Campana
+    @Subject: Inteligencia Artificial
+    @Assignment: Trabajo Practico Nº 1
+
+    Primer Ejercicio, funcionamiento de aspiradora simple sin
+    conocimiento de sus alrededores.
+"""
+
 import random
 
 # Estado de las baldosas
@@ -83,8 +92,8 @@ class Aspiradora:
 
     def mostrar_aspiradora(self, len_piso):
         cadena = ''
-        for cad in range(0, len_piso):
-            if cad == self.posicion:
+        for i in range(0, len_piso):
+            if i == self.posicion:
                 cadena = cadena + '|A|'
             else:
                 cadena = cadena + '| |'
