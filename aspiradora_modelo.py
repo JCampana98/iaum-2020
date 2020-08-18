@@ -34,7 +34,6 @@ class Piso:
         for j in range(0, len(self.fila_baldosas)):
             baldosa = Baldosa()
             baldosa.set_estado()
-
             self.fila_baldosas[j] = baldosa
 
     def set_paredes(self):
@@ -51,12 +50,34 @@ class Piso:
 
 
 class Aspiradora:
+    piso_aux = Piso()
     posicion = 0
     direccion = 'derecha'
+    giros = 0
     movimientos = 0
+    condicion_piso = []
+
+    def set_condicion_piso(self, len_piso):
+        for cond in range(0, len_piso):
+            self.condicion_piso.append(0)
+
+    def update_condicion_piso(self, condicion):
+        if condicion == pared:
+            self.condicion_piso[self.posicion] = -1
+        if condicion == 'limpieza':
+            self.condicion_piso[self.posicion] = self.condicion_piso[self.posicion] + 1
+        if condicion == 'avance':
+            self.condicion_piso[self.posicion] = self.condicion_piso[self.posicion] + 1
 
     def avanzar(self):
         self.movimientos += 1
+        if self.condicion_piso[self.posicion] == 0:
+            self.update_condicion_piso('avance')
+            print('Por aca no habia pasado \n')
+        elif self.condicion_piso[self.posicion] == -1:
+            print('Me choque con una pared \n')
+        elif self.condicion_piso[self.posicion] > 1:
+            print('Aca limpie \n')
         if self.direccion == 'izquierda':
             self.posicion -= 1
         elif self.direccion == 'derecha':
@@ -65,21 +86,32 @@ class Aspiradora:
 
     def girar_izquierda(self):
         self.movimientos += 1
+        self.giros += 1
         self.direccion = 'izquierda'
+        self.posicion -= 1
         print('Gire a la izquierda \n')
 
     def girar_derecha(self):
         self.movimientos += 1
+        self.giros += 1
         self.direccion = 'derecha'
+        self.posicion += 1
         print('Gire a la derecha \n')
 
-    def limpiar(self):
+    def limpiar(self, estado):
         self.movimientos += 1
-        print('Limpie \n')
-
-    def revisar_suciedad(self):
-        self.movimientos += 1
-        print('Limpie \n')
+        if estado == poco:
+            self.update_condicion_piso('limpieza')
+            print('Limpie \n')
+            return limpio
+        elif estado == sucio:
+            self.update_condicion_piso('limpieza')
+            print('Limpie \n')
+            return poco
+        elif estado == permanente:
+            self.update_condicion_piso('limpieza')
+            print('Limpie \n')
+            return permanente
 
     def mostrar_aspiradora(self, len_piso):
         cadena = ''
@@ -98,28 +130,30 @@ if __name__ == '__main__':
 
     aspiradora = Aspiradora()
     aspiradora.posicion = random.randrange(1, len(piso.fila_baldosas) - 1)
+    aspiradora.set_condicion_piso(len(piso.fila_baldosas))
 
     print('Estado inicial de la aspiradora y el piso')
     piso.mostrar_piso()
     aspiradora.mostrar_aspiradora(len(piso.fila_baldosas))
 
-    for i in range(0, 100):
+    # El programa se detiene cuando se toco dos paredes, es decir, se realizaron dos giros
+
+    while aspiradora.giros < 2:
+        pared_tocada = False
         if piso.fila_baldosas[aspiradora.posicion].estado == pared:
+            aspiradora.update_condicion_piso(pared)
+            pared_tocada = True
             if aspiradora.direccion == 'derecha':
                 aspiradora.girar_izquierda()
-                aspiradora.avanzar()
             elif aspiradora.direccion == 'izquierda':
                 aspiradora.girar_derecha()
-                aspiradora.avanzar()
-        if piso.fila_baldosas[aspiradora.posicion].estado == poco:
-            aspiradora.limpiar()
-            piso.fila_baldosas[aspiradora.posicion].estado = limpio
-        elif piso.fila_baldosas[aspiradora.posicion].estado == sucio:
-            aspiradora.limpiar()
-            piso.fila_baldosas[aspiradora.posicion].estado = poco
-        elif piso.fila_baldosas[aspiradora.posicion].estado == permanente:
-            aspiradora.limpiar()
-        aspiradora.avanzar()
+        if aspiradora.condicion_piso[aspiradora.posicion] < 1 and aspiradora.condicion_piso[aspiradora.posicion] != -1:
+            for limpieza in range(0, 2):
+                if piso.fila_baldosas[aspiradora.posicion].estado != limpio:
+                    piso.fila_baldosas[aspiradora.posicion].estado = \
+                        aspiradora.limpiar(piso.fila_baldosas[aspiradora.posicion].estado)
+        if not pared_tocada:
+            aspiradora.avanzar()
         piso.mostrar_piso()
         aspiradora.mostrar_aspiradora(len(piso.fila_baldosas))
 
